@@ -3,35 +3,6 @@
 ## Overview
 An agentic retrieval-augmented generation system designed to interface with a daily-updated structured relational database to provide conversational insights over policy documents.
 
-## Project Structure
-```
-my-project/
-├── data_pipeline/          # Contains the data processing pipeline
-│   ├── __init__.py
-│   ├── downloader.py       # Functions for downloading data
-│   ├── processor.py        # Functions for processing data
-│   ├── db_loader.py        # Loads processed data into a database
-│   └── main_pipeline.py     # Main entry point for the data pipeline
-├── agent/                  # Contains the agent for LLM interaction
-│   ├── __init__.py
-│   ├── llm_client.py       # Client for interacting with the LLM
-│   ├── tool_executor.py     # Executes defined tools
-│   └── agent_core.py        # Core logic of the agent
-├── api/                    # Contains the API for external interaction
-│   ├── __init__.py
-│   ├── main.py             # Entry point for the API
-│   ├── models.py           # Data models for the API
-│   ├── templates/          # HTML templates
-│   │   └── index.html
-│   └── static/             # Static files (CSS/JS)
-│       └── script.js
-├── db_setup/               # Database setup files
-│   └── schema.sql          # SQL schema for the database
-├── config.py               # Configuration settings
-├── requirements.txt        # Project dependencies
-└── README.md               # Project documentation
-```
-
 ## Setup Instructions
 1. Clone the repository:
    ```
