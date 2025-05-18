@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Federal Register Agent</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+
+        #chatbox {
+            width: 100%;
+            max-width: 70%;
+            margin: auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+        }
+
+        #chatlogs {
+            padding: 20px;
+            height: 100%;
+            overflow-y: auto;
+            border-bottom: 1px solid #ddd;
+            flex: 1 1 auto;
+        }
+
+        #chatinput {
+            display: flex;
+            padding: 10px;
+            flex-shrink: 0;
+            background: #fff;
+            border-radius: 0 0 8px 8px;
+            border-top: 1px solid #eee;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            line-height: 1.4;
+        }
+
+        .user {
+            background-color: #e1f5fe;
+            text-align: right;
+            margin-left: 40px;
+        }
+
+        .assistant {
+            background-color: #f0f0f0;
+            margin-right: 40px;
+        }
+
+        .message strong {
+            font-weight: bold;
+        }
+
+        #userInput {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        #sendButton {
+            padding: 10px 15px;
+            margin-left: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #sendButton:hover {
+            background-color: #0056b3;
+        }
+
+        .thinking {
+            font-style: italic;
+            color: #777;
+            text-align: center;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    
+    <div id="chatbox">
+        <div style="width:100%;padding:32px 0 16px 0;text-align:center;">
+            <span style="font-size:2.2rem;font-weight:bold;letter-spacing:1px;">
+                Agentic RAG Question Answering System
+            </span>
+        </div>
+        <div id="chatlogs"></div>
+        <div id="chatinput">
+            <input type="text" id="userInput" placeholder="Ask about federal documents..." autocomplete="off">
+            <button id="sendButton">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+        const chatlogs = document.getElementById('chatlogs');
+        let chatHistory = [{ role: "assistant", content: "Hello! How can I help you with Federal Registry documents today?" }]; // Initialize with greeting
+
+        function formatAssistantText(text) {
+            // Bold: **word**
+            text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            // Markdown link: [name](url)
+            text = text.replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+            // Newlines to <br>
+            return text.replace(/\n/g, '<br>');
+        }
+
+        function addMessage(role, text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', role);
+            if (role === 'assistant') {
+                messageDiv.innerHTML = `<strong>Assistant:</strong> ${formatAssistantText(text)}`;
+            } else {
+                messageDiv.innerHTML = `<strong>User:</strong> ${text.replace(/\n/g, '<br>')}`;
+            }
+            chatlogs.appendChild(messageDiv);
+            chatlogs.scrollTop = chatlogs.scrollHeight; // Auto-scroll
+        }
+
+        async function sendMessage() {
+            const query = userInput.value.trim();
+            if (!query) return;
+
+            addMessage('user', query);
+            userInput.value = ''; // Clear input
+
+            const thinkingDiv = document.createElement('div');
+            thinkingDiv.classList.add('thinking');
+            thinkingDiv.textContent = 'Assistant is thinking...';
+            chatlogs.appendChild(thinkingDiv);
+            chatlogs.scrollTop = chatlogs.scrollHeight;
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: query, history: chatHistory }),
+                });
+
+                chatlogs.removeChild(thinkingDiv); // Remove thinking indicator
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ detail: "Unknown error" }));
+                    addMessage('assistant', `Error: ${response.status} - ${errorData.detail || "Could not get response."}`);
+                    return;
+                }
+
+                const data = await response.json();
+                addMessage('assistant', data.answer);
+                chatHistory = data.history; // Update history with the full history from server
+            } catch (error) {
+                chatlogs.removeChild(thinkingDiv); // Remove thinking indicator
+                console.error('Fetch error:', error);
+                addMessage('assistant', 'Sorry, there was an error connecting to the server.');
+            }
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+
+    </script>
+</body>
+
+</html>

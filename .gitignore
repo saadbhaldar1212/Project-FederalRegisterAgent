@@ -1,0 +1,6 @@
+.venv
+.env
+__pychache__
+*.pyc
+data_pipeline/processed_data
+data_pipeline/raw_data
