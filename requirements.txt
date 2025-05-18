@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+openai  
+aiomysql
+aiohttp
+aiofiles
+python-dotenv
+requests 
+pydantic
+jinja2
