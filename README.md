@@ -49,17 +49,17 @@ my-project/
 
 4. Create a `.env` file in root folder and configure the environment variable as follows:
 
-```
-DB_HOST=""
-DB_USER=""
-DB_PASSWORD=""
-DB_NAME=""
-DB_PORT=""
-
-OLLAMA_BASE_URL=""
-OLLAMA_MODEL=""
-OLLAMA_API_KEY=""
-```
+   ```
+   DB_HOST=""
+   DB_USER=""
+   DB_PASSWORD=""
+   DB_NAME=""
+   DB_PORT=""
+   
+   OLLAMA_BASE_URL=""
+   OLLAMA_MODEL=""
+   OLLAMA_API_KEY=""
+   ```
 
 ## Usage
 - To run the data pipeline, execute:
