@@ -1,0 +1,432 @@
+html,
+body {
+    height: 100%;
+    width: 100%;
+    min-height: 100vh;
+    min-width: 100vw;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #e0e7ff 0%, #f8fafc 100%);
+    min-height: 100vh;
+    min-width: 100vw;
+    width: 100vw;
+    height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow: hidden;
+}
+
+.fade-in {
+    animation: fadeIn 1s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.centered-container {
+    min-height: 100vh;
+    min-width: 100vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.welcome-title {
+    font-size: 2.8rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #1e293b;
+    margin-bottom: 32px;
+    text-shadow: 0 2px 8px #c7d2fe;
+    text-align: center;
+}
+
+.welcome-btn {
+    font-size: 1.2rem;
+    padding: 16px 36px;
+    margin: 12px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #6366f1 0%, #2563eb 100%);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 12px rgba(99, 102, 241, 0.15);
+    transition: background 0.2s, transform 0.2s;
+}
+
+.welcome-btn:hover {
+    background: linear-gradient(90deg, #818cf8 0%, #1d4ed8 100%);
+    transform: translateY(-2px) scale(1.03);
+}
+
+/* Chat UI */
+#chatbox {
+    width: 100%;
+    max-width: 70%;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(30, 41, 59, 0.10);
+    display: flex;
+    flex-direction: column;
+    min-height: 90vh;
+    overflow: hidden;
+    position: relative;
+    animation: fadeIn 0.8s;
+}
+
+#chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 32px 12px 32px;
+    background: linear-gradient(90deg, #6366f1 0%, #2563eb 100%);
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    position: relative;
+}
+
+#chat-header .header-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+#chat-header .header-title {
+    flex: 1 1 auto;
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+}
+
+#chat-header .header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#clearChatBtn {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #fff;
+    font-size: 1rem;
+    padding: 8px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+#clearChatBtn:hover {
+    background: rgba(255, 255, 255, 0.30);
+}
+
+#chatlogs {
+    padding: 28px 32px 16px 32px;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    background: #f8fafc;
+    transition: background 0.3s;
+}
+
+.message {
+    margin-bottom: 22px;
+    padding: 18px 22px;
+    border-radius: 12px;
+    line-height: 1.6;
+    font-size: 1.08rem;
+    max-width: 80%;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.07);
+    opacity: 0;
+    animation: fadeIn 0.7s forwards;
+}
+
+.user {
+    background: linear-gradient(90deg, #dbeafe 0%, #f1f5f9 100%);
+    text-align: right;
+    margin-left: auto;
+    color: #334155;
+}
+
+.assistant {
+    background: linear-gradient(90deg, #ede9fe 0%, #f3f4f6 100%);
+    margin-right: auto;
+    color: #4f46e5;
+}
+
+.message strong {
+    font-weight: bold;
+}
+
+#chatinput {
+    display: flex;
+    padding: 18px 32px;
+    background: #fff;
+    border-top: 1px solid #e0e7ef;
+}
+
+#userInput {
+    flex-grow: 1;
+    padding: 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    outline: none;
+    transition: border 0.2s;
+    font-family: 'Montserrat', sans-serif;
+}
+
+#userInput::placeholder {
+    font-family: 'Montserrat', sans-serif;
+    color: #a5b4fc;
+    font-size: 1.08rem;
+    opacity: 1;
+}
+
+#sendButton {
+    padding: 14px 24px;
+    margin-left: 14px;
+    background: linear-gradient(90deg, #6366f1 0%, #2563eb 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#sendButton:hover {
+    background: linear-gradient(90deg, #818cf8 0%, #1d4ed8 100%);
+}
+
+.thinking {
+    font-style: italic;
+    color: #64748b;
+    text-align: center;
+    padding: 10px;
+    animation: fadeIn 0.6s;
+}
+
+/* Database Table Modal */
+#dbModal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(30, 41, 59, 0.18);
+    justify-content: center;
+    align-items: center;
+}
+
+#dbModalContent {
+    background: #fff;
+    border-radius: 14px;
+    padding: 32px 28px;
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow: auto;
+    box-shadow: 0 8px 32px rgba(30, 41, 59, 0.18);
+    animation: fadeIn 0.5s;
+}
+
+#closeDbModal {
+    float: right;
+    font-size: 1.3rem;
+    background: none;
+    border: none;
+    color: #6366f1;
+    cursor: pointer;
+    margin-bottom: 12px;
+}
+
+table.db-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 18px;
+}
+
+table.db-table th,
+table.db-table td {
+    border: 1px solid #e5e7eb;
+    padding: 10px 14px;
+    text-align: left;
+}
+
+table.db-table th {
+    background: #6366f1;
+    color: #fff;
+    font-weight: 700;
+}
+
+table.db-table tr:nth-child(even) {
+    background: #f1f5f9;
+}
+
+/* Responsive */
+@media (max-width: 800px) {
+    #chatbox {
+        max-width: 98vw;
+    }
+
+    #chat-header,
+    #chatlogs,
+    #chatinput {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .welcome-title {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 500px) {
+    .welcome-title {
+        font-size: 1.3rem;
+    }
+
+    .welcome-btn {
+        font-size: 1rem;
+        padding: 12px 18px;
+    }
+
+    #chatbox {
+        min-height: 90vh;
+        max-width: 98vw;
+    }
+}
+
+.modal-overlay {
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(30, 41, 59, 0.25);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.2s;
+}
+.modal-content {
+    background: #fff;
+    border-radius: 14px;
+    padding: 32px 28px;
+    box-shadow: 0 8px 32px rgba(30, 41, 59, 0.18);
+    min-width: 320px;
+    max-width: 90vw;
+    text-align: center;
+    animation: fadeIn 0.3s;
+}
+.modal-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 12px;
+}
+.modal-message {
+    color: #64748b;
+    margin-bottom: 24px;
+}
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+}
+.modal-btn {
+    padding: 10px 22px;
+    border-radius: 6px;
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: #e0e7ff;
+    color: #374151;
+    transition: background 0.2s;
+}
+.modal-btn:hover {
+    background: #c7d2fe;
+}
+.modal-btn.danger {
+    background: #f87171;
+    color: #fff;
+}
+.modal-btn.danger:hover {
+    background: #ef4444;
+}
+
+
+/* Add at the end or near modal styles for better look */
+#pipelineProgressBar {
+    box-shadow: 0 2px 8px rgba(99,102,241,0.07);
+}
+#pipelineProgressFill {
+    min-width: 8%;
+}
+#viewDataBtn {
+    background: linear-gradient(90deg, #22d3ee 0%, #2563eb 100%);
+    color: #fff;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 28px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+#viewDataBtn:hover {
+    background: linear-gradient(90deg, #38bdf8 0%, #1d4ed8 100%);
+}
+
+
+#backHomeBtn {
+    position: relative;
+    left: 0;
+    margin-right: 18px;
+    /* background: #1e293b; */
+    border: none;
+    color: black;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s;
+    box-shadow: none;
+    outline: none;
+}
+#backHomeBtn:hover, #backHomeBtn:focus {
+    background: #e0e7ff;
+    color: #1e293b;
+}

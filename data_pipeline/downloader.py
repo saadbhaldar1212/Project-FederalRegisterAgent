@@ -37,7 +37,9 @@ async def fetch_documents_for_date_range(
     }
 
     print(f"Fetching documents from {start_date_str} to {end_date_str}")
-    while True:
+
+    flag = True
+    while flag:
         params["page"] = page
         try:
             async with session.get(config.FEDERAL_REGISTER_API_URL) as response:
@@ -54,6 +56,10 @@ async def fetch_documents_for_date_range(
                     break
                 page += 1
                 await asyncio.sleep(0.5)
+
+                if page == 10:
+                    print("Fetching 10 pages at once, stopping to avoid rate limits.")
+                    flag = False
         except aiohttp.ClientError as e:
             print(f"Error fetching page {page}: {e}")
             break

@@ -1,4 +1,4 @@
-# Federal Register Agent - Agentic RAG Qustion Answering System
+# Federal Register Agent - Agentic RAG Question Answering System
 
 ## Overview
 An agentic retrieval-augmented generation system designed to interface with a daily-updated structured relational database to provide conversational insights over policy documents.
