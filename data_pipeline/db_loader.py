@@ -26,21 +26,19 @@ async def load_data_to_db(processed_data_list):
     async with pool.acquire() as conn:
         async with conn.cursor() as cur:
             insert_query = """
-            INSERT INTO documents (document_number, title, type, abstract, publication_date,
-                                   agencies, document_url, pdf_url, raw_text_url, president, executive_order_number)
-            VALUES (%(document_number)s, %(title)s, %(type)s, %(abstract)s, %(publication_date)s,
-                    %(agencies)s, %(document_url)s, %(pdf_url)s, %(raw_text_url)s, %(president)s, %(executive_order_number)s)
+            INSERT INTO documents (document_number, title, type, abstract, publication_date, agencies, document_url, pdf_url, raw_text_url, president, executive_order_number)
+            VALUES (%(document_number)s, %(title)s, %(type)s, %(abstract)s, %(publication_date)s,%(agencies)s, %(document_url)s, %(pdf_url)s, %(raw_text_url)s, %(president)s, %(executive_order_number)s) AS alias
             ON DUPLICATE KEY UPDATE
-                title = VALUES(title),
-                type = VALUES(type),
-                abstract = VALUES(abstract),
-                publication_date = VALUES(publication_date),
-                agencies = VALUES(agencies),
-                document_url = VALUES(document_url),
-                pdf_url = VALUES(pdf_url),
-                raw_text_url = VALUES(raw_text_url),
-                president = VALUES(president),
-                executive_order_number = VALUES(executive_order_number),
+                title = alias.title,
+                type = alias.type,
+                abstract = alias.abstract,
+                publication_date = alias.publication_date,
+                agencies = alias.agencies,
+                document_url = alias.document_url,
+                pdf_url = alias.pdf_url,
+                raw_text_url = alias.raw_text_url,
+                president = alias.president,
+                executive_order_number = alias.executive_order_number,
                 updated_at = CURRENT_TIMESTAMP
             """
 
@@ -74,8 +72,6 @@ async def load_data_to_db(processed_data_list):
             finally:
                 pool.close()
                 print("Database connection closed.")
-                await pool.wait_closed()
-                print("Pool closed.")
 
 
 if __name__ == "__main__":

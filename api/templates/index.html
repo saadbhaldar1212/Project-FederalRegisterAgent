@@ -5,101 +5,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Federal Register Agent</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            margin: 20px;
-            background-color: #f4f4f4;
-        }
-
-        #chatbox {
-            width: 100%;
-            max-width: 70%;
-            margin: auto;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            height: 90vh;
-        }
-
-        #chatlogs {
-            padding: 20px;
-            height: 100%;
-            overflow-y: auto;
-            border-bottom: 1px solid #ddd;
-            flex: 1 1 auto;
-        }
-
-        #chatinput {
-            display: flex;
-            padding: 10px;
-            flex-shrink: 0;
-            background: #fff;
-            border-radius: 0 0 8px 8px;
-            border-top: 1px solid #eee;
-        }
-
-        .message {
-            margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 5px;
-            line-height: 1.4;
-        }
-
-        .user {
-            background-color: #e1f5fe;
-            text-align: right;
-            margin-left: 40px;
-        }
-
-        .assistant {
-            background-color: #f0f0f0;
-            margin-right: 40px;
-        }
-
-        .message strong {
-            font-weight: bold;
-        }
-
-        #userInput {
-            flex-grow: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-
-        #sendButton {
-            padding: 10px 15px;
-            margin-left: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        #sendButton:hover {
-            background-color: #0056b3;
-        }
-
-        .thinking {
-            font-style: italic;
-            color: #777;
-            text-align: center;
-            padding: 10px;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:700,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 
 <body>
-    
-    <div id="chatbox">
-        <div style="width:100%;padding:32px 0 16px 0;text-align:center;">
-            <span style="font-size:2.2rem;font-weight:bold;letter-spacing:1px;">
-                Agentic RAG Question Answering System
-            </span>
+    <!-- Welcome Page -->
+    <div id="welcomePage" class="centered-container fade-in">
+        <div class="welcome-title">Agentic RAG Question Answering System</div>
+        <button class="welcome-btn" id="getStartedBtn">Get Started</button>
+        <button class="welcome-btn" id="updatePipelineBtn">Update Data Pipeline</button>
+        <div id="pipelineProgressContainer" style="display:none; margin-top:18px; width:100%; max-width:420px;">
+            <div id="pipelineProgressBar" style="height:18px; background:#e0e7ff; border-radius:8px; overflow:hidden;">
+                <div id="pipelineProgressFill"
+                    style="width:0%; height:100%; background:linear-gradient(90deg,#6366f1,#2563eb); transition:width 0.4s;">
+                </div>
+            </div>
+            <div id="pipelineProgressText" style="margin-top:8px; color:#64748b; text-align:center; font-size:1rem;">
+                Updating data pipeline...</div>
+        </div>
+        <div id="pipelineResultContainer" style="display:none; margin-top:18px; text-align:center;">
+            <div id="pipelineSummary" style="margin-bottom:12px; color:#1e293b; font-weight:600;"></div>
+            <button id="viewDataBtn" class="welcome-btn" style="display:none;">View Data</button>
+        </div>
+    </div>
+
+    <!-- Chat Interface (hidden by default) -->
+    <div id="chatbox" style="display:none;">
+        <div id="chat-header">
+            <div class="header-left">
+                <button id="backHomeBtn" class="back-btn" title="Back to Home">&#8592; Back</button>
+            </div>
+            <span class="header-title">Agentic RAG Question Answering System</span>
+            <div class="header-right">
+                <button id="clearChatBtn" title="Clear chat history">Clear Chat</button>
+            </div>
         </div>
         <div id="chatlogs"></div>
         <div id="chatinput">
@@ -108,82 +48,26 @@
         </div>
     </div>
 
-    <script>
-        const userInput = document.getElementById('userInput');
-        const sendButton = document.getElementById('sendButton');
-        const chatlogs = document.getElementById('chatlogs');
-        let chatHistory = [{ role: "assistant", content: "Hello! How can I help you with Federal Registry documents today?" }]; // Initialize with greeting
+    <!-- Database Table Modal -->
+    <div id="dbModal">
+        <div id="dbModalContent">
+            <button id="closeDbModal">&times; Close</button>
+            <div id="dbTableContainer"></div>
+        </div>
+    </div>
 
-        function formatAssistantText(text) {
-            // Bold: **word**
-            text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-            // Markdown link: [name](url)
-            text = text.replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
-            // Newlines to <br>
-            return text.replace(/\n/g, '<br>');
-        }
+    <div id="clearChatModal" class="modal-overlay" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-title">Clear Chat?</div>
+            <div class="modal-message">Are you sure you want to clear the chat history?</div>
+            <div class="modal-actions">
+                <button id="confirmClearChat" class="modal-btn danger">Yes, Clear</button>
+                <button id="cancelClearChat" class="modal-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
 
-        function addMessage(role, text) {
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message', role);
-            if (role === 'assistant') {
-                messageDiv.innerHTML = `<strong>Assistant:</strong> ${formatAssistantText(text)}`;
-            } else {
-                messageDiv.innerHTML = `<strong>User:</strong> ${text.replace(/\n/g, '<br>')}`;
-            }
-            chatlogs.appendChild(messageDiv);
-            chatlogs.scrollTop = chatlogs.scrollHeight; // Auto-scroll
-        }
-
-        async function sendMessage() {
-            const query = userInput.value.trim();
-            if (!query) return;
-
-            addMessage('user', query);
-            userInput.value = ''; // Clear input
-
-            const thinkingDiv = document.createElement('div');
-            thinkingDiv.classList.add('thinking');
-            thinkingDiv.textContent = 'Assistant is thinking...';
-            chatlogs.appendChild(thinkingDiv);
-            chatlogs.scrollTop = chatlogs.scrollHeight;
-
-            try {
-                const response = await fetch('/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ query: query, history: chatHistory }),
-                });
-
-                chatlogs.removeChild(thinkingDiv); // Remove thinking indicator
-
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({ detail: "Unknown error" }));
-                    addMessage('assistant', `Error: ${response.status} - ${errorData.detail || "Could not get response."}`);
-                    return;
-                }
-
-                const data = await response.json();
-                addMessage('assistant', data.answer);
-                chatHistory = data.history; // Update history with the full history from server
-            } catch (error) {
-                chatlogs.removeChild(thinkingDiv); // Remove thinking indicator
-                console.error('Fetch error:', error);
-                addMessage('assistant', 'Sorry, there was an error connecting to the server.');
-            }
-        }
-
-        sendButton.addEventListener('click', sendMessage);
-        userInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
-
-
-    </script>
+    <script src="/static/main.js"></script>
 </body>
 
 </html>
