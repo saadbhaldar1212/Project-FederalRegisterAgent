@@ -5,3 +5,4 @@ __pychache__
 data_pipeline/processed_data
 data_pipeline/raw_data
 tracker
+.vscode
