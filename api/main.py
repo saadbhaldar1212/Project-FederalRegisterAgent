@@ -56,13 +56,21 @@ async def get_database():
     Update connection details and table name as needed.
     """
 
+    from config import global_config as config
+
     try:
+        timeout = 10
         conn = pymysql.connect(
-            host=os.getenv("DB_HOST"),
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD"),
-            database=os.getenv("DB_NAME"),
+            charset="utf8mb4",
+            connect_timeout=timeout,
             cursorclass=pymysql.cursors.DictCursor,
+            db=config.DB_NAME,
+            host=config.DB_HOST,
+            password=config.DB_PASSWORD,
+            read_timeout=timeout,
+            port=config.DB_PORT,
+            user=config.DB_USER,
+            write_timeout=timeout,
         )
         with conn.cursor() as cursor:
             cursor.execute(f"SELECT * FROM documents")

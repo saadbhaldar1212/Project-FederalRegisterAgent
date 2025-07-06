@@ -42,7 +42,7 @@ async def run_pipeline():
 
     if processed_data:
         print("\n--- Loading Data to DB ---")
-        await load_data_to_db(processed_data)
+        load_data_to_db(processed_data)
     else:
         print("\nNo new data processed to load into DB.")
 
