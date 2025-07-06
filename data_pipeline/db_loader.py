@@ -1,77 +1,82 @@
 import os
 import json
 import asyncio
-import aiomysql
+import pymysql
 
 from config import global_config as config
 
 
-async def get_db_pool():
-    return await aiomysql.create_pool(
+def get_db_pool():
+    timeout = 10
+    connection = pymysql.connect(
+        charset="utf8mb4",
+        connect_timeout=timeout,
+        cursorclass=pymysql.cursors.DictCursor,
+        db=config.DB_NAME,
         host=config.DB_HOST,
+        password=config.DB_PASSWORD,
+        read_timeout=timeout,
         port=config.DB_PORT,
         user=config.DB_USER,
-        password=config.DB_PASSWORD,
-        db=config.DB_NAME,
-        autocommit=False,
+        write_timeout=timeout,
     )
+    return connection
 
 
-async def load_data_to_db(processed_data_list):
+def load_data_to_db(processed_data_list):
     if not processed_data_list:
         print("No data to load into the database.")
         return
 
-    pool = await get_db_pool()
-    async with pool.acquire() as conn:
-        async with conn.cursor() as cur:
-            insert_query = """
-            INSERT INTO documents (document_number, title, type, abstract, publication_date, agencies, document_url, pdf_url, raw_text_url, president, executive_order_number)
-            VALUES (%(document_number)s, %(title)s, %(type)s, %(abstract)s, %(publication_date)s,%(agencies)s, %(document_url)s, %(pdf_url)s, %(raw_text_url)s, %(president)s, %(executive_order_number)s) AS alias
-            ON DUPLICATE KEY UPDATE
-                title = alias.title,
-                type = alias.type,
-                abstract = alias.abstract,
-                publication_date = alias.publication_date,
-                agencies = alias.agencies,
-                document_url = alias.document_url,
-                pdf_url = alias.pdf_url,
-                raw_text_url = alias.raw_text_url,
-                president = alias.president,
-                executive_order_number = alias.executive_order_number,
-                updated_at = CURRENT_TIMESTAMP
-            """
+    connection = get_db_pool()
+    with connection.cursor() as cur:
+        insert_query = """
+        INSERT INTO documents (document_number, title, type, abstract, publication_date, agencies, document_url, pdf_url, raw_text_url, president, executive_order_number)
+        VALUES (%(document_number)s, %(title)s, %(type)s, %(abstract)s, %(publication_date)s,%(agencies)s, %(document_url)s, %(pdf_url)s, %(raw_text_url)s, %(president)s, %(executive_order_number)s) AS alias
+        ON DUPLICATE KEY UPDATE
+            title = alias.title,
+            type = alias.type,
+            abstract = alias.abstract,
+            publication_date = alias.publication_date,
+            agencies = alias.agencies,
+            document_url = alias.document_url,
+            pdf_url = alias.pdf_url,
+            raw_text_url = alias.raw_text_url,
+            president = alias.president,
+            executive_order_number = alias.executive_order_number,
+            updated_at = CURRENT_TIMESTAMP
+        """
 
-            default_keys = [
-                "document_number",
-                "title",
-                "type",
-                "abstract",
-                "publication_date",
-                "agencies",
-                "document_url",
-                "pdf_url",
-                "raw_text_url",
-                "president",
-                "executive_order_number",
-            ]
+        default_keys = [
+            "document_number",
+            "title",
+            "type",
+            "abstract",
+            "publication_date",
+            "agencies",
+            "document_url",
+            "pdf_url",
+            "raw_text_url",
+            "president",
+            "executive_order_number",
+        ]
 
-            data_for_execution = []
-            for record in processed_data_list:
+        data_for_execution = []
+        for record in processed_data_list:
 
-                normalized_record = {key: record.get(key) for key in default_keys}
-                data_for_execution.append(normalized_record)
+            normalized_record = {key: record.get(key) for key in default_keys}
+            data_for_execution.append(normalized_record)
 
-            try:
-                await cur.executemany(insert_query, data_for_execution)
-                await conn.commit()
-                print(f"Successfully inserted/updated {cur.rowcount} records.")
-            except Exception as e:
-                await conn.rollback()
-                print(f"Error during database load: {e}")
-            finally:
-                pool.close()
-                print("Database connection closed.")
+        try:
+            cur.executemany(insert_query, data_for_execution)
+            connection.commit()
+            print(f"Successfully inserted/updated {cur.rowcount} records.")
+        except Exception as e:
+            connection.rollback()
+            print(f"Error during database load: {e}")
+        finally:
+            connection.close()
+            print("Database connection closed.")
 
 
 if __name__ == "__main__":
